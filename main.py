@@ -3,6 +3,7 @@ import player
 import sys
 import physics
 import object
+import math
 
 clock = pygame.time.Clock()
 
@@ -25,7 +26,7 @@ turnTicker = 0
 p1 = player.player(0,0,WHITE,10)
 p1MoveMap = [False,False,False,False,False,False]
 
-objects = object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),1)
+objects = object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),3)
 print(objects)
 camera = []
 
@@ -97,6 +98,8 @@ def draw(obj):
         match o[2]:
             case 0:
                 pygame.draw.polygon(screen,WHITE,object.rect(o))
+            case 1:
+                pygame.draw.circle(screen,WHITE,o[0],o[1])
             case _:
                 print('object type not supported')
 
