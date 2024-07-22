@@ -12,13 +12,22 @@ DISPLAY_WIDTH = 800
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
+WALL_HEIGHT = 100
+
+CAMERA_WIDTH = DISPLAY_WIDTH * 0.8
+MAX_CAST = 250
+RAY_NUMS = 100
+FOV = 120
+
 moveTicker = 0
 turnTicker = 0
 
 p1 = player.player(0,0,WHITE,10)
 p1MoveMap = [False,False,False,False,False,False]
 
-objects = [[[100,100],[110,110]]]
+objects = object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),1)
+print(objects)
+camera = []
 
 pygame.display.init()
 screen = pygame.display.set_mode((DISPLAY_WIDTH,DISPLAY_HEIGHT))
@@ -85,12 +94,28 @@ def move(moveMap):
 
 def draw(obj):
     for o in obj:
-        pygame.draw.polygon(screen,WHITE,object.rect(o))
+        match o[2]:
+            case 0:
+                pygame.draw.polygon(screen,WHITE,object.rect(o))
+            case _:
+                print('object type not supported')
 
-def sendRays(p,num,fov,dir):
+def sendRays(p,num,fov,dir,dist):
+    camera = []
     for i in range(num):
-        end = physics.endpointCalc(p,dir-fov/2+i*(fov/num),100,objects)
+        line = physics.endpointCalc(p,dir-fov/2+i*(fov/num),dist,objects)
+        end = line[0]
+        camera.append(line[1])
         pygame.draw.line(screen,WHITE,p,end)
+    return camera
+
+def drawCamera(cam):
+    x = DISPLAY_WIDTH/2 - CAMERA_WIDTH/2
+    for c in cam:
+        wall = WALL_HEIGHT * (1-(c/MAX_CAST))
+        lineLen = DISPLAY_HEIGHT/2 - wall / 2
+        pygame.draw.line(screen,WHITE,(x,lineLen),(x,lineLen + wall))
+        x += CAMERA_WIDTH / len(cam)
 
 while True:
     get_keys()
@@ -98,6 +123,7 @@ while True:
     screen.fill(BLACK)
     p1.draw(screen)
     draw(objects)
-    sendRays(p1.pos,100,120,p1.dir)
+    camera = sendRays(p1.pos,RAY_NUMS,FOV,p1.dir,MAX_CAST)
+    drawCamera(camera)
     pygame.display.update()
     clock.tick(120)
