@@ -23,11 +23,15 @@ FOV = 120
 moveTicker = 0
 turnTicker = 0
 
-p1 = player.player(0,0,WHITE,10)
-p1MoveMap = [False,False,False,False,False,False]
+p1 = player.player(60,60,WHITE,10)
+p1MoveMap = [False,False,False,False,False,False,False,False]
+p1prevmove = [0,0]
 
 objects = [] # object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),3)
 print(objects)
+wallI = 0
+wallTransparency = [0,64,128,192,255]
+
 camera = []
 
 pygame.display.init()
@@ -42,6 +46,7 @@ def gen_map():
     print("done mazing")
 
 def get_keys():
+    global wallI
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -59,6 +64,13 @@ def get_keys():
                 p1MoveMap[4] = True
             if event.key == pygame.K_d:
                 p1MoveMap[5] = True
+            if event.key == pygame.K_w:
+                p1MoveMap[6] = True
+            if event.key == pygame.K_s:
+                p1MoveMap[7] = True
+            if event.key == pygame.K_SPACE:
+                wallI += 1
+                wallI = wallI % len(wallTransparency)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
                 p1MoveMap[0] = False
@@ -72,6 +84,16 @@ def get_keys():
                 p1MoveMap[4] = False
             if event.key == pygame.K_d:
                 p1MoveMap[5] = False
+            if event.key == pygame.K_w:
+                p1MoveMap[6] = False
+            if event.key == pygame.K_s:
+                p1MoveMap[7] = False
+
+def playerCollision():
+    for o in objects:
+        if p1.collision(o):
+            return True
+    return False
 
 def move(moveMap):
     global moveTicker
@@ -87,9 +109,15 @@ def move(moveMap):
             p1.move([-1,0])
             moveTicker += 1
         if moveMap[3]:
-           p1.move([1,0])
-           moveTicker += 1
-    else:
+            p1.move([1,0])
+            moveTicker += 1
+        if moveMap[6]:
+            p1.move2(1)
+            moveTicker += 1
+        if moveMap[7]:
+            p1.move2(-1)
+            moveTicker += 1
+    elif moveTicker > 0:
         moveTicker -= 1
     if turnTicker < 10:
         if moveMap[4]:
@@ -102,10 +130,17 @@ def move(moveMap):
         turnTicker -= 1
 
 def drawTransparent(obj):
-    s = pygame.Surface((obj[1][0] - obj[0][0],obj[1][1] - obj[0][1]))
-    s.set_alpha(10)
-    s.fill(WHITE)
-    screen.blit(s,obj[0])
+    match obj[2]:
+        case 0:
+            s = pygame.Surface((obj[1][0] - obj[0][0],obj[1][1] - obj[0][1]))
+            s.set_alpha(wallTransparency[wallI])
+            s.fill(WHITE)
+            screen.blit(s,obj[0])
+        case 1:
+            s = pygame.Surface((obj[0][0]-obj[1],obj[0][1]-obj[1]),(obj[0][0]+obj[1],obj[0][1]+obj[1]))
+            s.set_alpha(wallTransparency[wallI])
+            pygame.draw.circle(s,WHITE,obj[0],obj[1])
+            screen.blit(s,(obj[0][0]-obj[1],obj[0][1]-obj[1]))
 
 def draw(obj):
     for o in obj:
@@ -139,7 +174,8 @@ gen_map()
 
 while True:
     get_keys()
-    move(p1MoveMap)
+    if not playerCollision():
+        move(p1MoveMap)
     screen.fill(BLACK)
     p1.draw(screen)
     draw(objects)
