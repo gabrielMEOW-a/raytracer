@@ -1,8 +1,9 @@
 import math
 
-def endpointCalc(p,dir,l,o):
+def endpointCalc(p,dir,l,o,pD):
     dir = math.radians(dir)
-    return raycast(p,dir,l,o)
+    pD = math.radians(pD)
+    return raycast(p,dir,l,o,pD)
 
 def collision(obj,p):
     match obj[2]:
@@ -16,7 +17,7 @@ def collision(obj,p):
         case _:
             print("collision not supported")
 
-def raycast(p,dir,l,objects):
+def raycast(p,dir,l,objects,pDir):
     stepSize = 10
     x = p[0]
     y = p[1]
@@ -25,7 +26,7 @@ def raycast(p,dir,l,objects):
         y += math.sin(dir) * stepSize
         for obj in objects:
             if collision(obj,(x,y)):
-                return [(x,y),i]
-    x = p[0] + math.cos(dir) * l * -math.sin(dir)
-    y = p[1] + math.sin(dir) * l * -math.sin(dir)
+                return [(x,y),i * math.cos(pDir-dir)]
+    x = p[0] + math.cos(dir) * l
+    y = p[1] + math.sin(dir) * l
     return [(x,y),l]

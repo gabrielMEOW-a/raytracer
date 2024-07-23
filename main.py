@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 # Variables
 DISPLAY_HEIGHT = 640
 DISPLAY_WIDTH = 800
-WHITE = (255,255,255)
+WHITE = (255,255,255,127)
 BLACK = (0,0,0)
 
 WALL_HEIGHT = 100
@@ -31,7 +31,7 @@ print(objects)
 camera = []
 
 pygame.display.init()
-screen = pygame.display.set_mode((DISPLAY_WIDTH,DISPLAY_HEIGHT))
+screen = pygame.display.set_mode((DISPLAY_WIDTH,DISPLAY_HEIGHT),pygame.SRCALPHA)
 
 def get_keys():
     for event in pygame.event.get():
@@ -83,12 +83,12 @@ def move(moveMap):
            moveTicker += 1
     else:
         moveTicker -= 1
-    if turnTicker < 1:
+    if turnTicker < 10:
         if moveMap[4]:
-            p1.turn(-10)
+            p1.turn(-1)
             turnTicker += 1
         if moveMap[5]:
-            p1.turn(10)
+            p1.turn(1)
             turnTicker += 1
     elif turnTicker > 0:
         turnTicker -= 1
@@ -103,10 +103,10 @@ def draw(obj):
             case _:
                 print('object type not supported')
 
-def sendRays(p,num,fov,dir,dist):
+def sendRays(p,num,fov,dir,dist, pDir):
     camera = []
     for i in range(num):
-        line = physics.endpointCalc(p,dir-fov/2+i*(fov/num),dist,objects)
+        line = physics.endpointCalc(p,dir-fov/2+i*(fov/num),dist,objects,pDir)
         end = line[0]
         camera.append(line[1])
         pygame.draw.line(screen,WHITE,p,end)
@@ -126,7 +126,7 @@ while True:
     screen.fill(BLACK)
     p1.draw(screen)
     draw(objects)
-    camera = sendRays(p1.pos,RAY_NUMS,FOV,p1.dir,MAX_CAST)
+    camera = sendRays(p1.pos,RAY_NUMS,FOV,p1.dir,MAX_CAST,p1.dir)
     drawCamera(camera)
     pygame.display.update()
     clock.tick(120)
