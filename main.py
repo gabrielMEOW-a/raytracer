@@ -3,7 +3,7 @@ import player
 import sys
 import physics
 import object
-import math
+import maze
 
 clock = pygame.time.Clock()
 
@@ -17,7 +17,7 @@ WALL_HEIGHT = 100
 
 CAMERA_WIDTH = DISPLAY_WIDTH * 0.8
 MAX_CAST = 250
-RAY_NUMS = 100
+RAY_NUMS = 50
 FOV = 120
 
 moveTicker = 0
@@ -26,12 +26,20 @@ turnTicker = 0
 p1 = player.player(0,0,WHITE,10)
 p1MoveMap = [False,False,False,False,False,False]
 
-objects = object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),3)
+objects = [] # object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),3)
 print(objects)
 camera = []
 
 pygame.display.init()
-screen = pygame.display.set_mode((DISPLAY_WIDTH,DISPLAY_HEIGHT),pygame.SRCALPHA)
+screen = pygame.display.set_mode((DISPLAY_WIDTH,DISPLAY_HEIGHT),pygame.DOUBLEBUF)
+
+def gen_map():
+    m = maze.mazing()
+    for i in range(len(m)):
+        for j in range(len(m[i])):
+            if m[i][j] == "w":
+                objects.append([[i*40,j*40],[i*40+40,j*40+40],0])
+    print("done mazing")
 
 def get_keys():
     for event in pygame.event.get():
@@ -93,11 +101,18 @@ def move(moveMap):
     elif turnTicker > 0:
         turnTicker -= 1
 
+def drawTransparent(obj):
+    s = pygame.Surface((obj[1][0] - obj[0][0],obj[1][1] - obj[0][1]))
+    s.set_alpha(10)
+    s.fill(WHITE)
+    screen.blit(s,obj[0])
+
 def draw(obj):
     for o in obj:
         match o[2]:
             case 0:
-                pygame.draw.polygon(screen,WHITE,object.rect(o))
+                drawTransparent(o)
+                #pygame.draw.polygon(screen,WHITE,object.rect(o))
             case 1:
                 pygame.draw.circle(screen,WHITE,o[0],o[1])
             case _:
@@ -119,6 +134,8 @@ def drawCamera(cam):
         lineLen = DISPLAY_HEIGHT/2 - wall / 2
         pygame.draw.line(screen,WHITE,(x,lineLen),(x,lineLen + wall))
         x += CAMERA_WIDTH / len(cam)
+
+gen_map()
 
 while True:
     get_keys()
