@@ -1,5 +1,6 @@
 import random
 
+# returns pygame format for rectangles
 def rect(obj):
     p1 = obj[0]
     p2 = [obj[1][0],obj[0][1]]
@@ -7,6 +8,7 @@ def rect(obj):
     p4 = [obj[0][0],obj[1][1]]
     return [p1,p2,p3,p4]
 
+# generate random objects
 def genObjects(max,num):
     objects = []
     for i in range(num):

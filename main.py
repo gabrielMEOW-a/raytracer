@@ -17,7 +17,7 @@ WALL_HEIGHT = 500
 
 CAMERA_WIDTH = DISPLAY_WIDTH * 0.8
 MAX_CAST = 250
-RAY_NUMS = 500
+RAY_NUMS = 100
 FOV = 120
 
 moveTicker = 0
@@ -27,7 +27,7 @@ p1 = player.player(60,60,WHITE,10)
 p1MoveMap = [False,False,False,False,False,False,False,False]
 p1prevmove = [0,0]
 
-objects = [] # object.genObjects((DISPLAY_WIDTH,DISPLAY_HEIGHT),3)
+objects = [] 
 print(objects)
 wallI = 0
 wallTransparency = [0,64,128,192,255]
@@ -37,6 +37,7 @@ camera = []
 pygame.display.init()
 screen = pygame.display.set_mode((DISPLAY_WIDTH,DISPLAY_HEIGHT),pygame.DOUBLEBUF)
 
+# generate map using prim's algorithm
 def gen_map():
     m = maze.mazing()
     for i in range(len(m)):
@@ -45,6 +46,7 @@ def gen_map():
                 objects.append([[i*40,j*40],[i*40+40,j*40+40],0])
     print("done mazing")
 
+# get keys and modify moveMap
 def get_keys():
     global wallI
     for event in pygame.event.get():
@@ -89,12 +91,14 @@ def get_keys():
             if event.key == pygame.K_s:
                 p1MoveMap[7] = False
 
+# check for player collisions
 def playerCollision():
     for o in objects:
         if p1.collision(o):
             return True
     return False
 
+# move according to moveMap
 def move(moveMap):
     global moveTicker
     global turnTicker
@@ -129,9 +133,11 @@ def move(moveMap):
     elif turnTicker > 0:
         turnTicker -= 1
 
+# transparent objects
 def drawTransparent(obj):
     match obj[2]:
         case 0:
+            # make new surface and blit onto screen
             s = pygame.Surface((obj[1][0] - obj[0][0],obj[1][1] - obj[0][1]))
             s.set_alpha(wallTransparency[wallI])
             s.fill(WHITE)
@@ -142,6 +148,7 @@ def drawTransparent(obj):
             pygame.draw.circle(s,WHITE,obj[0],obj[1])
             screen.blit(s,(obj[0][0]-obj[1],obj[0][1]-obj[1]))
 
+# object drawing
 def draw(obj):
     for o in obj:
         match o[2]:
@@ -153,6 +160,7 @@ def draw(obj):
             case _:
                 print('object type not supported')
 
+# send rays
 def sendRays(p,num,fov,dir,dist, pDir):
     camera = []
     for i in range(num):
@@ -162,6 +170,7 @@ def sendRays(p,num,fov,dir,dist, pDir):
         pygame.draw.line(screen,WHITE,p,end)
     return camera
 
+# render rays
 def drawCamera(cam):
     x = DISPLAY_WIDTH/2 - CAMERA_WIDTH/2
     for c in cam:
@@ -170,7 +179,17 @@ def drawCamera(cam):
         pygame.draw.line(screen,WHITE,(x,lineLen),(x,lineLen + wall))
         x += CAMERA_WIDTH / len(cam)
 
-gen_map()
+def drawText():
+    pass
+
+#gen_map()
+
+# test objects
+objects = [[(307, 324), (771, 452), 0], [(265, 403), 20, 1], 
+           [(94, 418), (787, 442), 0], [(489, 273), (526, 491), 0], 
+           [(358, 149), (619, 419), 0], [(439, 445), (599, 631), 0], 
+           [(84, 535), 12, 1], [(42, 296), 18, 1], 
+           [(456, 206), 10, 1], [(607, 0), 17, 1]]
 
 while True:
     get_keys()
