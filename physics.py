@@ -1,5 +1,34 @@
 import math
 
+class Point():
+    def __init__(self,p = [0,0]):
+        self.p = p
+    def __sub__(self,other):
+        return Point((self.p[0]-other.p[0],self.p[1]-other.p[1]))
+    def __abs__(self):
+        return Point((abs(self.p[0]),abs(self.p[1])))
+    
+def clamp(min,max,val):
+    if val < min:
+        return min
+    elif val > max:
+        return max
+    return val
+
+#WIP
+"""def proxCheck(p,r,obj):
+    for o in obj:
+        match obj[2]:
+            case 0:
+                p1 = Point(p)
+                p2 = Point()
+                p2.p[0] = (obj[0][0]+obj[1][0])/2
+                p2.p[1] = (obj[0][1]+obj[1][1])/2
+                relCenter = p1-p2
+                offset = abs(relCenter) - 
+                if o 
+"""
+
 def endpointCalc(p,dir,l,o,pD):
     dir = math.radians(dir)
     pD = math.radians(pD)
