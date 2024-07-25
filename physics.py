@@ -31,6 +31,14 @@ def proxCheck(p,r,obj): # 2x frame boost!!! (60fps / 120fps on test)
                 p2.p[1] = clamp(o[0][1],o[1][1],p1.p[1])
                 if p1.distance(p2) <= r:
                     inRange.append(o)
+            case 1:
+                p1 = Point(p)
+                p2 = Point(o[0])
+                d = p1.distance(p2) - o[1]
+                if d <= r:
+                    inRange.append(o)
+            case _:
+                inRange.append(o)
     return inRange
 
 def endpointCalc(p,dir,l,o,pD):

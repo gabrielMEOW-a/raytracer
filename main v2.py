@@ -1,8 +1,8 @@
 import pygame
-import player
+import playerV2
 import sys
 import physics
-import object
+import objectV2
 import maze
 
 clock = pygame.time.Clock()
@@ -23,7 +23,7 @@ FOV = 120
 moveTicker = 0
 turnTicker = 0
 
-p1 = player.player(60,60,WHITE,10)
+p1 = playerV2.player(60,60,WHITE,10)
 p1MoveMap = [False,False,False,False,False,False,False,False]
 p1prevmove = [0,0]
 
@@ -43,7 +43,7 @@ def gen_map():
     for i in range(len(m)):
         for j in range(len(m[i])):
             if m[i][j] == "w":
-                objects.append([[i*40,j*40],[i*40+40,j*40+40],0])
+                objects.append(objectV2.Rect([i*40,j*40],[i*40+40,j*40+40]))
     print("done mazing")
 
 # get keys and modify moveMap
@@ -135,30 +135,30 @@ def move(moveMap):
 
 # transparent objects
 def drawTransparent(obj):
+    # make new surface and blit onto screen
+    s = pygame.Surface(obj.size())
+    s.set_alpha(wallTransparency[wallI])
     match obj[2]:
         case 0:
-            # make new surface and blit onto screen
-            s = pygame.Surface((obj[1][0] - obj[0][0],obj[1][1] - obj[0][1]))
-            s.set_alpha(wallTransparency[wallI])
             s.fill(WHITE)
-            screen.blit(s,obj[0])
+            screen.blit(s,obj.p1)
         case 1:
-            s = pygame.Surface((obj[0][0]-obj[1],obj[0][1]-obj[1]),(obj[0][0]+obj[1],obj[0][1]+obj[1]))
-            s.set_alpha(wallTransparency[wallI])
-            pygame.draw.circle(s,WHITE,obj[0],obj[1])
-            screen.blit(s,(obj[0][0]-obj[1],obj[0][1]-obj[1]))
+            pygame.draw.circle(s,WHITE,obj.p,obj.r)
+            screen.blit(s,(obj.p[0]-obj.r,obj.p[1]-obj.r))
 
 # object drawing
 def draw(obj):
     for o in obj:
-        match o[2]:
+        drawTransparent(o)
+        
+        """match o[2]:
             case 0:
                 drawTransparent(o)
-                #pygame.draw.polygon(screen,WHITE,object.rect(o))
+                #pygame.draw.polygon(screen,WHITE,object.rect(o)) DEPRECATED
             case 1:
-                pygame.draw.circle(screen,WHITE,o[0],o[1])
+                pygame.draw.circle(screen,WHITE,o.p,o.r)
             case _:
-                print('object type not supported')
+                print('object type not supported')"""
 
 # send rays
 def sendRays(p,num,fov,dir,dist, pDir):
