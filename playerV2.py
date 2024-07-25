@@ -1,6 +1,6 @@
 import math
 import pygame
-import physics
+import physicsV2
 
 class player:
     def __init__(self, x, y, color, size,dir=0):
@@ -19,4 +19,4 @@ class player:
     def draw(self, sur):
         pygame.draw.circle(sur, self.color, self.pos, self.size)
     def collision(self, obj):
-        return physics.collision(obj,self.pos)
+        return physicsV2.collision(obj,self.pos)

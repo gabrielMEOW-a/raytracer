@@ -1,7 +1,7 @@
 import pygame
 import playerV2
 import sys
-import physics
+import physicsV2
 import objectV2
 import maze
 
@@ -138,11 +138,11 @@ def drawTransparent(obj):
     # make new surface and blit onto screen
     s = pygame.Surface(obj.size())
     s.set_alpha(wallTransparency[wallI])
-    match obj[2]:
-        case 0:
+    match str(type(obj)):
+        case "<class 'objectV2.Rect'>":
             s.fill(WHITE)
             screen.blit(s,obj.p1)
-        case 1:
+        case "<class 'objectV2.Circle'>":
             pygame.draw.circle(s,WHITE,obj.p,obj.r)
             screen.blit(s,(obj.p[0]-obj.r,obj.p[1]-obj.r))
 
@@ -150,7 +150,7 @@ def drawTransparent(obj):
 def draw(obj):
     for o in obj:
         drawTransparent(o)
-        
+
         """match o[2]:
             case 0:
                 drawTransparent(o)
@@ -164,7 +164,7 @@ def draw(obj):
 def sendRays(p,num,fov,dir,dist, pDir):
     camera = []
     for i in range(num):
-        line = physics.endpointCalc(p,dir-fov/2+i*(fov/num),dist,objects,pDir)
+        line = physicsV2.endpointCalc(p,dir-fov/2+i*(fov/num),dist,objects,pDir)
         end = line[0]
         camera.append(line[1])
         pygame.draw.line(screen,WHITE,p,end)
@@ -183,15 +183,15 @@ def drawCamera(cam):
 def drawText():
     pass
 
-gen_map()
+#gen_map()
 
 # test objects
-"""objects = [[(307, 324), (771, 452), 0], [(265, 403), 20, 1], 
+objects = [[(307, 324), (771, 452), 0], [(265, 403), 20, 1], 
            [(94, 418), (787, 442), 0], [(489, 273), (526, 491), 0], 
            [(358, 149), (619, 419), 0], [(439, 445), (599, 631), 0], 
            [(84, 535), 12, 1], [(42, 296), 18, 1], 
            [(456, 206), 10, 1], [(607, 0), 17, 1]]
-"""
+
 while True:
     get_keys()
     if not playerCollision():
