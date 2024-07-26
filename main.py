@@ -12,6 +12,7 @@ DISPLAY_HEIGHT = 640
 DISPLAY_WIDTH = 800
 WHITE = (255,255,255,127)
 BLACK = (0,0,0)
+CYAN = (3,155,229)
 
 WALL_HEIGHT = 500
 
@@ -43,7 +44,7 @@ def gen_map():
     for i in range(len(m)):
         for j in range(len(m[i])):
             if m[i][j] == "w":
-                objects.append([[i*40,j*40],[i*40+40,j*40+40],0])
+                objects.append([[i*40,j*40],[i*40+40,j*40+40],0,(3,155,229)])
     print("done mazing")
 
 # get keys and modify moveMap
@@ -140,7 +141,7 @@ def drawTransparent(obj):
             # make new surface and blit onto screen
             s = pygame.Surface((obj[1][0] - obj[0][0],obj[1][1] - obj[0][1]))
             s.set_alpha(wallTransparency[wallI])
-            s.fill(WHITE)
+            s.fill(obj[3])
             screen.blit(s,obj[0])
         case 1:
             s = pygame.Surface((obj[0][0]-obj[1],obj[0][1]-obj[1]),(obj[0][0]+obj[1],obj[0][1]+obj[1]))
@@ -174,10 +175,12 @@ def sendRays(p,num,fov,dir,dist, pDir):
 def drawCamera(cam):
     x = DISPLAY_WIDTH/2 - CAMERA_WIDTH/2
     for c in cam:
-        color = (1-(c/MAX_CAST)) * 255
+        cr = (1-(c/MAX_CAST)) * CYAN[0]
+        cg = (1-(c/MAX_CAST)) * CYAN[1]
+        cb = (1-(c/MAX_CAST)) * CYAN[2]
         wall = WALL_HEIGHT * (1-(c/MAX_CAST))
         lineLen = DISPLAY_HEIGHT/2 - wall / 2
-        pygame.draw.line(screen,(color,color,color),(x,lineLen),(x,lineLen + wall))
+        pygame.draw.line(screen,(cr,cg,cb),(x,lineLen),(x,lineLen + wall))
         x += CAMERA_WIDTH / len(cam)
 
 def drawText():
